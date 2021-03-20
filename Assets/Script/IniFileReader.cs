@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Collections;
+using System.IO;
 using UnityEngine;
+
 
 public class IniFileReader {
     // 大文字小文字を区別するか？
@@ -19,19 +20,21 @@ public class IniFileReader {
         // UTF-8ではなくデフォルトANSI（日本ならShiftJIS）にしとく
         // ※テキストの先頭に UTF8/16LE/16BE のBOMが付いてる場合は、
         // この指定は無視して Unicode で読み込まれる。
-        if ( encoding == null )
-            { encoding = Encoding.Default; }
+        if (encoding == null) {
+            encoding = Encoding.Default;
+        }
 
-        using ( var reader = new System.IO.StreamReader( path, encoding ) )
-        {
-            var line = reader.ReadLine();
-            while ( line != null )
-            {
-                // 行頭行末のスペース、空行とコメント行は最初から省いておく
-                line = line.Trim();
-                if ( !String.IsNullOrEmpty( line ) && (line[0] != ';') )
-                    { mLines.Add( line ); }
-                line = reader.ReadLine();
+        using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read ,FileShare.ReadWrite)) {
+            using (TextReader sr = new StreamReader(fs, encoding)) {
+                string line = sr.ReadLine();
+                while ( line != null ) {
+                    // 行頭行末のスペース、空行とコメント行は最初から省いておく
+                    line = line.Trim();
+                    if (!String.IsNullOrEmpty(line) && (line[0] != ';')) {
+                        mLines.Add( line );
+                    }
+                    line = sr.ReadLine();
+                }
             }
         }
     }
