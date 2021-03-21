@@ -13,10 +13,7 @@ public class IniFileReader {
     private List<string>    mLines = new List<string>();
     private int             mSectionTop = -1;
 
-    public IniFileReader(
-        string path,
-        Encoding encoding = null)
-    {
+    public IniFileReader(string path, Encoding encoding = null) {
         // UTF-8ではなくデフォルトANSI（日本ならShiftJIS）にしとく
         // ※テキストの先頭に UTF8/16LE/16BE のBOMが付いてる場合は、
         // この指定は無視して Unicode で読み込まれる。
@@ -24,19 +21,24 @@ public class IniFileReader {
             encoding = Encoding.Default;
         }
 
-        using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read ,FileShare.ReadWrite)) {
-            using (TextReader sr = new StreamReader(fs, encoding)) {
-                string line = sr.ReadLine();
-                while ( line != null ) {
-                    // 行頭行末のスペース、空行とコメント行は最初から省いておく
-                    line = line.Trim();
-                    if (!String.IsNullOrEmpty(line) && (line[0] != ';')) {
-                        mLines.Add( line );
+        if (File.Exists(path)) {
+            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read ,FileShare.ReadWrite)) {
+                        using (TextReader sr = new StreamReader(fs, encoding)) {
+                            string line = sr.ReadLine();
+                            while ( line != null ) {
+                                // 行頭行末のスペース、空行とコメント行は最初から省いておく
+                                line = line.Trim();
+                                if (!String.IsNullOrEmpty(line) && (line[0] != ';')) {
+                                    mLines.Add( line );
+                                }
+                                line = sr.ReadLine();
+                            }
+                        }
                     }
-                    line = sr.ReadLine();
-                }
-            }
         }
+        
+
+        
     }
 
     // セクションを設定
